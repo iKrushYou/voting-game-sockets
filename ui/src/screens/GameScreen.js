@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import io from "socket.io-client";
 import {useGameContext} from "../context/GameContext";
 import {SOCKET_ENDPOINT_DEV, SOCKET_FUNCTIONS} from "../config";
@@ -226,63 +226,58 @@ function QuestionAnswer({currentQuestion, handleCastVote, userId, game}) {
     );
 }
 
-const TIMEOUT = 2500
+const TIMEOUT = 1000
 
 function QuestionComplete({currentQuestion, getUser}) {
 
-    const [votedForChrissy, setVotedChrissy] = useState([])
-    const [votedForDenise, setVotedDenise] = useState([])
-    const [doneVoting, setDoneVoting] = useState(false)
-    const [step, setStep] = useState(0)
+    const [votes, setVotes] = useState({chrissy: [], denise: []})
+    const responseCount = Object.keys(currentQuestion.responses).length;
+    const doneVoting = useMemo(() => votes.chrissy.length + votes.denise.length === responseCount, [votes])
+    const [step, setStep] = useState(-1)
 
+    const counterRef = useRef();
+
+    const increaseCounter = () => {
+        setStep(step => step + 1)
+    }
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setStep(s => s + 1)
-        }, TIMEOUT);
-        return () => clearTimeout(timer);
-
-    }, [])
-    useEffect(() => {
-        console.log(step)
-        if ((step + 1) <= Object.keys(currentQuestion.responses).length) {
-            const [userId, answer] = Object.entries(currentQuestion.responses)[step]
-
+        if (step === Object.keys(currentQuestion.responses).length) {
+            clearInterval(counterRef.current);
+            return;
+        }
+        if (step >= 0) {
+            const entries = Object.entries(currentQuestion.responses)
+            const [userId, answer] = entries[step]
             const user = getUser(userId)
 
-            if (answer === 'Chrissy') {
-
-                setVotedChrissy(chrissy => {
-                    if (!chrissy.includes(user.name)) {
-                        return [...chrissy, user.name]
-                    } else {
-                        return [...chrissy]
-                    }
-                })
-            } else {
-                setVotedDenise(denise => {
-                    if (!denise.includes(user.name)) {
-                        return [...denise, user.name]
-                    } else {
-                        return [...denise]
-                    }
-                })
-            }
+            setVotes(prev => ({ ...prev, [answer.toLowerCase()]: [...prev[answer.toLowerCase()], user.name] }))
         }
+    }, [step])
 
-        if ((step + 1) === Object.keys(currentQuestion.responses).length) {
-            setDoneVoting(true)
+    useEffect(() => {
+        if (currentQuestion.done) {
+            setVotes({chrissy: [], denise: []})
+            setStep(-1)
+
+            const counter = setInterval(() => {
+                increaseCounter();
+            }, TIMEOUT)
+
+            counterRef.current = counter;
+            
+            return () => clearInterval(counter);
         }
+    }, [currentQuestion.done])
 
 
-    }, [currentQuestion, step])
+    // const percentChrissy = !!votes["chrissy"].length ? ((votes["chrissy"].length / (votes["denise"].length + votes["chrissy"].length)) * 100).toFixed(2) : 0
+    // const percentDenise = !!votes["denise"].length ? ((votes["denise"].length / (votes["denise"].length + votes["chrissy"].length)) * 100).toFixed(2) : 0
+    const votePercent = 1 / responseCount
+    const percentChrissy = votes["chrissy"].length * votePercent * 100
+    const percentDenise = votes["denise"].length * votePercent * 100
 
-
-    const percentChrissy = !!votedForChrissy.length ? ((votedForChrissy.length / (votedForDenise.length + votedForChrissy.length)) * 100).toFixed(2) : 0
-    const percentDenise = !!votedForDenise.length ? ((votedForDenise.length / (votedForDenise.length + votedForChrissy.length)) * 100).toFixed(2) : 0
-
-
-    const winner = votedForChrissy.length === votedForDenise.length ? 'Tied' : votedForChrissy.length > votedForDenise.length ? 'Chrissy' : 'Denise'
+    const winner = votes["chrissy"].length === votes["denise"].length ? 'Tied' : votes["chrissy"].length > votes["denise"].length ? 'Chrissy' : 'Denise'
     return (
         <Grid item xs={12}>
             <Grid container spacing={1} direction="row" justify="center" alignItems="center">
@@ -297,7 +292,7 @@ function QuestionComplete({currentQuestion, getUser}) {
                     )}
                     {doneVoting && (
                         <Typography
-                            variant={"h6"}>{winner === 'Tied' ? 'Everyone Drink!!' : winner === 'Chrissy' ? `Drink : ${votedForDenise.length ? votedForDenise.join(', ') : 'Just Dan I guess since everyone voted the same '}` : `Drink : ${votedForChrissy.length ? votedForChrissy.join(', ') : 'Just Dan I guess since everyone voted the same'}`}</Typography>
+                            variant={"h6"}>{winner === 'Tied' ? 'Everyone Drink!!' : winner === 'Chrissy' ? `Drink : ${votes["denise"].length ? votes["denise"].join(', ') : 'Just Dan I guess since everyone voted the same '}` : `Drink : ${votes["chrissy"].length ? votes["chrissy"].join(', ') : 'Just Dan I guess since everyone voted the same'}`}</Typography>
                     )}
                 </Grid>
                 <Grid item xs={6}>
@@ -306,7 +301,7 @@ function QuestionComplete({currentQuestion, getUser}) {
 
                     >
                         <CardHeader
-                            title={`Number of Votes : ${votedForChrissy.length}`}
+                            title={`Number of Votes : ${votes["chrissy"].length}`}
                         />
                         <CardMedia
                             component="img"
@@ -316,7 +311,7 @@ function QuestionComplete({currentQuestion, getUser}) {
 
                         />
 
-                        {!!votedForChrissy.length && (
+                        {!!votes["chrissy"].length && (
                             <div
                                 style={{
                                     position: 'absolute',
@@ -340,7 +335,7 @@ function QuestionComplete({currentQuestion, getUser}) {
                                 left: '10px',
                             }}
                         >
-                            {votedForChrissy.map((name, ind) =>
+                            {votes["chrissy"].map((name, ind) =>
                                 <Grid
                                     item
                                     key={ind}
@@ -357,7 +352,7 @@ function QuestionComplete({currentQuestion, getUser}) {
                         style={{position: 'relative', overflow: 'hidden'}}
                     >
                         <CardHeader
-                            title={`Number of Votes : ${votedForDenise.length}`}
+                            title={`Number of Votes : ${votes["denise"].length}`}
                         />
                         <CardMedia
                             component="img"
@@ -366,7 +361,7 @@ function QuestionComplete({currentQuestion, getUser}) {
                             title="Denise"
 
                         />
-                        {!!votedForDenise.length && (
+                        {!!votes["denise"].length && (
                             <div
                                 style={{
                                     position: 'absolute',
@@ -390,7 +385,7 @@ function QuestionComplete({currentQuestion, getUser}) {
                                 left: '10px',
                             }}
                         >
-                            {votedForDenise.map((name, ind) =>
+                            {votes["denise"].map((name, ind) =>
                                 <Grid
                                     item
                                     key={ind}
