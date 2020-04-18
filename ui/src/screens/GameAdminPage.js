@@ -19,7 +19,7 @@ import { handleChangeQuestion, handleFinishQuestion, handleResetGame } from "../
 
 let socket;
 
-export default function GameAdminPage({history}) {
+export default function GameAdminPage({ history }) {
   const { userId, userName } = useGameContext();
 
   const [game, setGame] = useState();
@@ -46,7 +46,7 @@ export default function GameAdminPage({history}) {
     });
 
     socket.on(SOCKET_FUNCTIONS.END_GAME, () => {
-      handleLeaveGame()
+      handleLeaveGame();
     });
 
     return () => {

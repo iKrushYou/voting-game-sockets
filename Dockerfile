@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:10-alpine
 
 WORKDIR /usr/src/app
 
@@ -10,4 +10,4 @@ RUN cd ui && yarn && yarn build
 
 EXPOSE 8080
 
-CMD ["node", "app.js"]
+ENTRYPOINT ["node", "app.js"]

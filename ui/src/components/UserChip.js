@@ -4,6 +4,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 
 export default function UserChip(props) {
   const { user, disabled = false } = props;
+  if (!user) return <></>;
   const { name } = user;
 
   const offline = !user.sockets.length;

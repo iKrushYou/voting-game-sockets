@@ -2,11 +2,11 @@ const express = require("express");
 const socketio = require("socket.io");
 const http = require("http");
 const moment = require("moment");
-const path = require('path');
+const path = require("path");
 
 const { game, joinGame, leaveGame, castVote, changeQuestion, finishQuestion, resetGame } = require("./game");
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 
 let app = express();
 const server = http.createServer(app);
@@ -18,10 +18,10 @@ app.use((request, result, next) => {
 });
 
 // serve UI
-app.use(express.static(path.join(__dirname, 'ui/build')));
-app.get('*', (req, res, next) => {
-  res.sendFile(path.join(__dirname+'/ui/build/index.html'));
-})
+app.use(express.static(path.join(__dirname, "ui/build")));
+app.get("*", (req, res, next) => {
+  res.sendFile(path.join(__dirname + "/ui/build/index.html"));
+});
 
 const SocketFunctions = {
   CONNECTION: "connection",

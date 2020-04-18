@@ -1,14 +1,19 @@
 const { uuid } = require("uuidv4");
-const data = require("./questions");
+// const data = require("./questions");
 const images = require("./images.json");
+const fs = require("fs");
+
+const loadQuestions = () => {
+  return JSON.parse(fs.readFileSync("./questions.json", "utf8"));
+};
 
 const blankGame = {
   users: [],
-  questions: data.questions,
+  questions: [...loadQuestions()],
   currentQuestion: 0,
 };
 
-const game = {...blankGame}
+const game = { ...blankGame };
 
 const findUserBySocketId = (socketId) => {
   return game.users.find((xUser) => xUser.sockets.includes(socketId));
@@ -38,7 +43,6 @@ const leaveGame = ({ socketId }) => {
       xUser.sockets = xUser.sockets.filter((xSocket) => xSocket !== socketId);
     }
   });
-  console.log(JSON.stringify(game));
 
   return { game };
 };
@@ -84,14 +88,14 @@ const finishQuestion = ({ socketId }) => {
   return { game };
 };
 
-const resetGame = ({socketId}) => {
+const resetGame = ({ socketId }) => {
   const user = findUserBySocketId(socketId);
   // if (!user.owner) return { error: "Not owner" };
-  game.users = []
-  game.questions = [...data.questions]
-  game.currentQuestion = 0
+  game.users = [];
+  game.questions = [...loadQuestions()];
+  game.currentQuestion = 0;
 
-  return {}
-}
+  return {};
+};
 
 module.exports = { game, joinGame, leaveGame, castVote, changeQuestion, finishQuestion, resetGame };
