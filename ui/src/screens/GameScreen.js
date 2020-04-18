@@ -81,7 +81,7 @@ export default function ({ history }) {
   const currentQuestion = game?.questions[game.currentQuestion];
 
   return (
-    <Container maxWidth={"md"}>
+    <Container maxWidth={"md"} disableGutters>
       <Card>
         <CardContent style={{ backgroundColor: "#ecf0f1" }}>
           <Grid container spacing={3}>
@@ -163,6 +163,8 @@ export default function ({ history }) {
 }
 
 function QuestionAnswer({ currentQuestion, handleCastVote, userId, game }) {
+  const usersLeftToVote = game.users.filter((_user) => !currentQuestion.responses.hasOwnProperty(_user.id));
+
   return (
     <Grid item xs={12}>
       <Grid container spacing={1}>
@@ -201,15 +203,13 @@ function QuestionAnswer({ currentQuestion, handleCastVote, userId, game }) {
           </Grid>
         ))}
         <Grid item xs={12}>
-          <Typography>Who hasn't voted: </Typography>
+          <Typography>{usersLeftToVote.length ? "Who hasn't voted:" : "Everyone has voted"}</Typography>
         </Grid>
-        {game.users
-          .filter((_user) => !currentQuestion.responses.hasOwnProperty(_user.id))
-          .map((_user) => (
-            <Grid item>
-              <UserChip key={_user.id} user={_user} />
-            </Grid>
-          ))}
+        {usersLeftToVote.map((_user) => (
+          <Grid item>
+            <UserChip key={_user.id} user={_user} />
+          </Grid>
+        ))}
       </Grid>
     </Grid>
   );
@@ -221,8 +221,10 @@ function QuestionComplete({ currentQuestion }) {
 
   return (
     <Grid item xs={12}>
-      <Typography variant={"h5"}>{currentQuestion.question}</Typography>
       <Grid container spacing={1} direction="row" justify="center" alignItems="center">
+        <Grid item xs={12}>
+          <Typography variant={"h5"}>{currentQuestion.question}</Typography>
+        </Grid>
         <Grid item xs={6}>
           <Card>
             <CardMedia component="img" height={500} image={chrissyImage} title="Chrissy" />

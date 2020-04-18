@@ -43,7 +43,13 @@ const leaveGame = ({ socketId }) => {
 const castVote = ({ socketId, questionId, choice }) => {
   const user = findUserBySocketId(socketId);
   const question = game.questions[questionId];
-  question.responses[user.id] = choice;
+  if (question.responses.hasOwnProperty(user.id)) {
+    // remove vote
+    delete question.responses[user.id];
+  } else {
+    // cast vote
+    question.responses[user.id] = choice;
+  }
 
   return { game };
 };
