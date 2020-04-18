@@ -185,7 +185,8 @@ function QuestionAnswer({ currentQuestion, handleCastVote, userId, game }) {
 
 function QuestionComplete({ currentQuestion }) {
   const [chrissyImage] = useState(images.chrissy[Math.floor(Math.random() * images.chrissy.length)]);
-  const [deniseImage] = useState(images.chrissy[Math.floor(Math.random() * images.denise.length)]);
+  const [deniseImage] = useState(images.denise[Math.floor(Math.random() * images.denise.length)]);
+
   return (
     <Grid item xs={12}>
       <Typography variant={"h5"}>{currentQuestion.question}</Typography>
