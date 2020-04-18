@@ -218,6 +218,7 @@ function QuestionAnswer({ currentQuestion, handleCastVote, userId, game }) {
   );
 }
 
+const TIMEOUT = 2500
 function QuestionComplete({ currentQuestion, getUser }) {
   const [chrissyImage] = useState(images.chrissy[Math.floor(Math.random() * images.chrissy.length)]);
   const [deniseImage] = useState(images.denise[Math.floor(Math.random() * images.denise.length)]);
@@ -225,40 +226,72 @@ function QuestionComplete({ currentQuestion, getUser }) {
   const [votedForChrissy, setVotedChrissy] = useState([])
   const [votedForDenise, setVotedDenise] = useState([])
   const [doneVoting, setDoneVoting] =useState(false)
+  const [step, setStep] = useState(0)
   useEffect(() => {
-    setDoneVoting(false)
-    console.log(currentQuestion)
-    Object.entries(currentQuestion.responses).map(([userId, answer]) => {
+    const timer = setTimeout(() => {
+      setStep(s  => s+1)
+    }, TIMEOUT);
+    return () => clearTimeout(timer);
+
+  }, [])
+  useEffect(() => {
+    console.log(step)
+    if ((step + 1) <= Object.keys(currentQuestion.responses).length) {
+      const [userId, answer] = Object.entries(currentQuestion.responses)[step]
+
       const user = getUser(userId)
 
-      console.log(user)
       if (answer === 'Chrissy') {
 
-        setTimeout(() => {
-          setVotedChrissy(chrissy => [...chrissy, user.name])
-        }, 2000);
+          setVotedChrissy(chrissy => {
+            if (!chrissy.includes(user.name)){
+              return [...chrissy, user.name]
+            } else {
+              return [...chrissy]
+            }
+          })
       } else {
-        setTimeout(() => {
-          setVotedDenise(denise => [...denise, user.name])
-        }, 2000);
+        setVotedDenise(denise => {
+          if (!denise.includes(user.name)){
+            return [...denise, user.name]
+          } else {
+            return [...denise]
+          }
+        })
       }
-    })
-    setDoneVoting(true)
+    }
+
+    if ((step + 1) === Object.keys(currentQuestion.responses).length) {
+      setDoneVoting(true)
+    }
 
 
 
-  }, [currentQuestion])
+  }, [currentQuestion, step])
 
 
+  const percentChrissy =  !! votedForChrissy.length ?    ((votedForChrissy.length / (votedForDenise.length + votedForChrissy.length)) * 100).toFixed(2): 0
+  const percentDenise =  !! votedForDenise.length ?    ((votedForDenise.length / (votedForDenise.length + votedForChrissy.length)) * 100).toFixed(2): 0
+
+  const winner = votedForChrissy.length === votedForDenise.length ? 'Tied' : votedForChrissy.length >  votedForDenise.length ? 'Chrissy' : 'Denise'
   return (
     <Grid item xs={12}>
       <Grid container spacing={1} direction="row" justify="center" alignItems="center">
         <Grid item xs={12}>
           <Typography variant={"h5"}>{currentQuestion.question}</Typography>
+          {!doneVoting && (
+              <Typography variant={"h5"}>Voting Tabulating</Typography>
+          )}
+          {doneVoting && (
+              <Typography variant={"h5"}>{winner === 'Tied' ? 'Tied between Denise and Chrissy' : `Winner is ${winner}`}</Typography>
+          )}
+          {doneVoting && (
+              <Typography variant={"h6"}>{winner === 'Tied' ? 'Everyone Drink!!' : winner === 'Chrissy' ? `Drink : ${votedForDenise.length  ? votedForDenise.join(', ') : 'Just Dan I guess since everyone voted the same '}` :`Drink : ${votedForChrissy.length ? votedForChrissy.join(', '): 'Just Dan I guess since everyone voted the same'}` }</Typography>
+          )}
         </Grid>
         <Grid item xs={6}>
           <Card
-              style={{overflow: 'hidden'}}
+              style={{position: 'relative', overflow:'hidden'}}
 
           >
             <CardHeader
@@ -266,36 +299,99 @@ function QuestionComplete({ currentQuestion, getUser }) {
               />
             <CardMedia
                 component="img"
-                height={500}
+                height="350"
                 image={chrissyImage}
                 title="Chrissy"
+
+            />
+
+            {!! votedForChrissy.length && (
+                <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '0',
+                      left: '0',
+                      color: 'black',
+                      backgroundColor: percentChrissy > 50 ? '#2ecc71': parseInt(percentChrissy) === 50 ? '#2980b9': '#e74c3c',
+                      width: '100%',
+                      height: `${(percentChrissy * .85).toFixed(2)}%`,
+                      opacity: 0.5,
+                    }}
+                >
+                </div>
+            )}
+            <Grid
+                container
+                spacing={1}
                 style={{
-                  height: 0,
-                  paddingTop: '56.25%' // 16:9
+                  position: 'absolute',
+                  bottom: '10px',
+                  left: '10px',
                 }}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                top: '20px',
-                left: '20px',
-                opacity: '0.4',
-                backgroundColor: 'red'
-              }}
-            />
+            >
+            {votedForChrissy.map((name, ind) =>
+                <Grid
+                    item
+                    key={ind}
+                >
+                  <Chip color={percentChrissy > 50 ? 'primary' : 'secondary'} label={name} />
+                </Grid>
+            )}
+            </Grid>
+
           </Card>
         </Grid>
-        <Grid item xs={6}>
-          <Card>
+        <Grid  item xs={6}>
+          <Card
+              style={{position: 'relative',  overflow:'hidden'}}
+          >
             <CardHeader
                 title={`Number of Votes : ${votedForDenise.length}`}
               />
             <CardMedia
                 component="img"
-                height="500"
+                height="350"
                 image={deniseImage}
                 title="Denise"
+
             />
+            {!! votedForDenise.length && (
+                <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '0',
+                      left: '0',
+                      color: 'black',
+                      backgroundColor: percentDenise > 50 ? '#2ecc71': parseInt(percentDenise) === 50 ? '#2980b9': '#e74c3c',
+                      width: '100%',
+                      height: `${(percentDenise * .85).toFixed(2)}%`,
+                      opacity: 0.5,
+                    }}
+                >
+                </div>
+            )}
+            <Grid
+              container
+              spacing={1}
+              style={{
+                position: 'absolute',
+                bottom: '10px',
+                left: '10px',
+              }}
+            >
+              {votedForDenise.map((name, ind) =>
+                  <Grid
+                      item
+                      key={ind}
+
+                  >
+                    <Chip color={percentDenise > 50 ? 'primary' : 'secondary'} label={name} />
+                  </Grid>
+              )}
+
+
+            </Grid>
+
           </Card>
         </Grid>
       </Grid>
