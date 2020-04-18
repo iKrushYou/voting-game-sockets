@@ -1,5 +1,5 @@
 const { uuid } = require("uuidv4");
-const data = require('./questions')
+const data = require("./questions");
 
 const game = {
   users: [],
@@ -55,9 +55,18 @@ const changeQuestion = ({ socketId, direction }) => {
     game.currentQuestion = Math.min(game.currentQuestion + 1, game.questions.length - 1);
   } else {
     game.currentQuestion = Math.max(game.currentQuestion - 1, 0);
+    game.questions[game.currentQuestion].done = false;
   }
 
   return { game };
 };
 
-module.exports = { game, joinGame, leaveGame, castVote, changeQuestion };
+const finishQuestion = ({ socketId }) => {
+  const user = findUserBySocketId(socketId);
+  if (!user.owner) return { error: "Not owner" };
+  const question = game.questions[game.currentQuestion];
+  question.done = true;
+  return { game };
+};
+
+module.exports = { game, joinGame, leaveGame, castVote, changeQuestion, finishQuestion };

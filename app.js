@@ -3,7 +3,7 @@ const socketio = require("socket.io");
 const http = require("http");
 const moment = require("moment");
 
-const { game, joinGame, leaveGame, castVote, changeQuestion } = require("./game");
+const { game, joinGame, leaveGame, castVote, changeQuestion, finishQuestion } = require("./game");
 
 const PORT = process.env.PORT || 3001;
 
@@ -22,6 +22,7 @@ const SocketFunctions = {
   JOIN_GAME: "JOIN_GAME",
   CAST_VOTE: "CAST_VOTE",
   CHANGE_QUESTION: "CHANGE_QUESTION",
+  FINISH_QUESTION: "FINISH_QUESTION",
   LEAVE_GAME: "LEAVE_GAME",
   GAME_UPDATE: "GAME_UPDATE",
   UPDATE_SCORE: "UPDATE_SCORE",
@@ -38,13 +39,13 @@ io.on(SocketFunctions.CONNECTION, (socket) => {
   console.log(moment().format() + ": connected - " + socket.id);
 
   socket.on(SocketFunctions.JOIN_GAME, (props, callback) => {
+    console.log(`${moment().format()}: ${SocketFunctions.JOIN_GAME} ${JSON.stringify(props)}`);
     const { userId, userName } = props;
     if (!userId || !userName) {
       callback({ error: "missing props" });
       return;
     }
 
-    console.log(`${moment().format()}: ${SocketFunctions.JOIN_GAME} ${JSON.stringify(props)}`);
     const { error, game } = joinGame({
       userId,
       userName,
@@ -90,6 +91,18 @@ io.on(SocketFunctions.CONNECTION, (socket) => {
     const { error, game } = changeQuestion({
       socketId: socket.id,
       direction,
+    });
+
+    updateGame(socket, game);
+
+    callback({});
+  });
+
+  socket.on(SocketFunctions.FINISH_QUESTION, (props, callback) => {
+    console.log(`${moment().format()}: ${SocketFunctions.CAST_VOTE} ${JSON.stringify(props)}`);
+
+    const { error, game } = finishQuestion({
+      socketId: socket.id,
     });
 
     updateGame(socket, game);
