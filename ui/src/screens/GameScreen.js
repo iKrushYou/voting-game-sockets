@@ -257,7 +257,10 @@ function QuestionComplete({ currentQuestion, getUser }) {
           <Typography variant={"h5"}>{currentQuestion.question}</Typography>
         </Grid>
         <Grid item xs={6}>
-          <Card>
+          <Card
+              style={{overflow: 'hidden'}}
+
+          >
             <CardHeader
                 title={`Number of Votes : ${votedForChrissy.length}`}
               />
@@ -267,20 +270,19 @@ function QuestionComplete({ currentQuestion, getUser }) {
                 image={chrissyImage}
                 title="Chrissy"
                 style={{
-                 position: 'relative'
-
+                  height: 0,
+                  paddingTop: '56.25%' // 16:9
                 }}
             />
             <div
               style={{
                 position: 'absolute',
-                color: 'black',
-                backgroundColor: 'white'
+                top: '20px',
+                left: '20px',
+                opacity: '0.4',
+                backgroundColor: 'red'
               }}
-            >
-              50
-
-            </div>
+            />
           </Card>
         </Grid>
         <Grid item xs={6}>
