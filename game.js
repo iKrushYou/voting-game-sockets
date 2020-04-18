@@ -1,21 +1,9 @@
 const { uuid } = require("uuidv4");
+const data = require('./questions')
 
 const game = {
   users: [],
-  questions: [
-    {
-      question: "What is 2+2",
-      choices: ["4", "Four", "5", "Greyson's Balls"],
-      answer: "Four",
-      responses: {},
-    },
-    {
-      question: "What is Greyson's Balls' Name",
-      choices: ["Greyson's Balls", "The Rock", "Patrick Mahomes", "Debbie"],
-      answer: "Four",
-      responses: {},
-    },
-  ],
+  questions: data.questions,
   currentQuestion: 0,
 };
 

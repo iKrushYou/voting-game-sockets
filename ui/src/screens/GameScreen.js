@@ -109,18 +109,18 @@ export default function ({ history }) {
                           >
                             <CardContent style={{ width: "100%" }}>
                               <Typography>{choice}</Typography>
-                              <Grid container spacing={1}>
-                                {Object.entries(currentQuestion.responses)
-                                  .filter(([_, responseChoice]) => responseChoice === choice)
-                                  .map(([responseUserId, responseChoice]) => {
-                                    const responseUser = getUser(responseUserId);
-                                    return (
-                                      <Grid item>
-                                        <Chip label={responseUser.name} />
-                                      </Grid>
-                                    );
-                                  })}
-                              </Grid>
+                              {/*<Grid container spacing={1}>*/}
+                              {/*  {Object.entries(currentQuestion.responses)*/}
+                              {/*    .filter(([_, responseChoice]) => responseChoice === choice)*/}
+                              {/*    .map(([responseUserId, responseChoice]) => {*/}
+                              {/*      const responseUser = getUser(responseUserId);*/}
+                              {/*      return (*/}
+                              {/*        <Grid item>*/}
+                              {/*          <Chip label={responseUser.name} />*/}
+                              {/*        </Grid>*/}
+                              {/*      );*/}
+                              {/*    })}*/}
+                              {/*</Grid>*/}
                             </CardContent>
                           </ButtonBase>
                         </Card>
@@ -128,17 +128,17 @@ export default function ({ history }) {
                     ))}
                   </Grid>
                 </Grid>
-                {currentUser?.owner && (
-                  <Grid item xs={12} style={{ display: "flex" }}>
-                    <Button variant={"outlined"} color={"primary"} onClick={() => handleChangeQuestion("PREV")}>
-                      Prev
-                    </Button>
-                    <div style={{ flex: 1 }} />
-                    <Button variant={"outlined"} color={"primary"} onClick={() => handleChangeQuestion("NEXT")}>
-                      Next
-                    </Button>
-                  </Grid>
-                )}
+                {/*{currentUser?.owner && (*/}
+                {/*  <Grid item xs={12} style={{ display: "flex" }}>*/}
+                {/*    <Button variant={"outlined"} color={"primary"} onClick={() => handleChangeQuestion("PREV")}>*/}
+                {/*      Prev*/}
+                {/*    </Button>*/}
+                {/*    <div style={{ flex: 1 }} />*/}
+                {/*    <Button variant={"outlined"} color={"primary"} onClick={() => handleChangeQuestion("NEXT")}>*/}
+                {/*      Next*/}
+                {/*    </Button>*/}
+                {/*  </Grid>*/}
+                {/*)}*/}
               </>
             ) : (
               <Grid item xs={12}>
@@ -150,7 +150,7 @@ export default function ({ history }) {
           </Grid>
         </CardContent>
       </Card>
-      <pre>{JSON.stringify(game, null, 2)}</pre>
+      {/*<pre>{JSON.stringify(game, null, 2)}</pre>*/}
     </Container>
   );
 }
