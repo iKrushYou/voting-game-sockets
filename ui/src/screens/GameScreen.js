@@ -253,38 +253,53 @@ function QuestionComplete({ currentQuestion, getUser }) {
   }, [currentQuestion]);
 
   return (
-    <Grid container spacing={1} direction="row" justify="center" alignItems="center">
-      <Grid item xs={12}>
-        <Typography variant={"h5"}>{currentQuestion.question}</Typography>
-      </Grid>
-      <Grid item xs={6}>
-        <Card>
-          <CardHeader title={`Number of Votes : ${votedForChrissy.length}`} />
-          <CardMedia
-            component="img"
-            height={500}
-            image={currentQuestion.chrissyImage}
-            title="Chrissy"
-            style={{
-              position: "relative",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              color: "black",
-              backgroundColor: "white",
-            }}
+    <Grid item xs={12}>
+      <Grid container spacing={1} direction="row" justify="center" alignItems="center">
+        <Grid item xs={12}>
+          <Typography variant={"h5"}>{currentQuestion.question}</Typography>
+        </Grid>
+        <Grid item xs={6}>
+          <Card
+              style={{overflow: 'hidden'}}
+
           >
-            50
-          </div>
-        </Card>
-      </Grid>
-      <Grid item xs={6}>
-        <Card>
-          <CardHeader title={`Number of Votes : ${votedForDenise.length}`} />
-          <CardMedia component="img" height="500" image={currentQuestion.deniseImage} title="Denise" />
-        </Card>
+            <CardHeader
+                title={`Number of Votes : ${votedForChrissy.length}`}
+              />
+            <CardMedia
+                component="img"
+                height={500}
+                image={currentQuestion.chrissyImage}
+                title="Chrissy"
+                style={{
+                  height: 0,
+                  paddingTop: '56.25%' // 16:9
+                }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                top: '20px',
+                left: '20px',
+                opacity: '0.4',
+                backgroundColor: 'red'
+              }}
+            />
+          </Card>
+        </Grid>
+        <Grid item xs={6}>
+          <Card>
+            <CardHeader
+                title={`Number of Votes : ${votedForDenise.length}`}
+              />
+            <CardMedia
+                component="img"
+                height="500"
+                image={currentQuestion.deniseImage}
+                title="Denise"
+            />
+          </Card>
+        </Grid>
       </Grid>
     </Grid>
   );
