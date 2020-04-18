@@ -19,12 +19,18 @@ import { handleChangeQuestion, handleFinishQuestion, handleResetGame } from "../
 
 let socket;
 
-export default function GameAdminPage() {
+export default function GameAdminPage({history}) {
   const { userId, userName } = useGameContext();
 
   const [game, setGame] = useState();
 
+  const handleLeaveGame = () => {
+    history.push("/");
+  };
+
   useEffect(() => {
+    if (!userName) handleLeaveGame();
+
     socket = io(SOCKET_ENDPOINT_DEV, { path: "/api/socket.io" });
 
     socket.on("connect", () => {
@@ -40,7 +46,7 @@ export default function GameAdminPage() {
     });
 
     socket.on(SOCKET_FUNCTIONS.END_GAME, () => {
-      window.location = window.location;
+      handleLeaveGame()
     });
 
     return () => {

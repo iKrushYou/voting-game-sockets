@@ -119,6 +119,7 @@ io.on(SocketFunctions.CONNECTION, (socket) => {
       socketId: socket.id,
     });
 
+    socket.emit(SocketFunctions.END_GAME, game);
     socket.broadcast.to(gameKey).emit(SocketFunctions.END_GAME, game);
 
     callback({});
