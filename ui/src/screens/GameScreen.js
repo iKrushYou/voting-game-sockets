@@ -12,8 +12,8 @@ import Chip from "@material-ui/core/Chip";
 import ButtonBase from "@material-ui/core/ButtonBase";
 import Button from "@material-ui/core/Button";
 import * as images from "../Image/images";
-import { CardMedia } from "@material-ui/core";
 import UserChip from "../components/UserChip";
+import { CardMedia, CardHeader } from "@material-ui/core";
 
 let socket;
 
@@ -106,7 +106,10 @@ export default function ({ history }) {
                   </Grid>
                 </Grid>
                 {currentQuestion.done ? (
-                  <QuestionComplete currentQuestion={currentQuestion} />
+                  <QuestionComplete
+                      currentQuestion={currentQuestion}
+                      getUser={getUser}
+                  />
                 ) : (
                   <QuestionAnswer
                     currentQuestion={currentQuestion}
@@ -215,9 +218,37 @@ function QuestionAnswer({ currentQuestion, handleCastVote, userId, game }) {
   );
 }
 
-function QuestionComplete({ currentQuestion }) {
+function QuestionComplete({ currentQuestion, getUser }) {
   const [chrissyImage] = useState(images.chrissy[Math.floor(Math.random() * images.chrissy.length)]);
   const [deniseImage] = useState(images.denise[Math.floor(Math.random() * images.denise.length)]);
+
+  const [votedForChrissy, setVotedChrissy] = useState([])
+  const [votedForDenise, setVotedDenise] = useState([])
+  const [doneVoting, setDoneVoting] =useState(false)
+  useEffect(() => {
+    setDoneVoting(false)
+    console.log(currentQuestion)
+    Object.entries(currentQuestion.responses).map(([userId, answer]) => {
+      const user = getUser(userId)
+
+      console.log(user)
+      if (answer === 'Chrissy') {
+
+        setTimeout(() => {
+          setVotedChrissy(chrissy => [...chrissy, user.name])
+        }, 2000);
+      } else {
+        setTimeout(() => {
+          setVotedDenise(denise => [...denise, user.name])
+        }, 2000);
+      }
+    })
+    setDoneVoting(true)
+
+
+
+  }, [currentQuestion])
+
 
   return (
     <Grid item xs={12}>
@@ -227,12 +258,42 @@ function QuestionComplete({ currentQuestion }) {
         </Grid>
         <Grid item xs={6}>
           <Card>
-            <CardMedia component="img" height={500} image={chrissyImage} title="Chrissy" />
+            <CardHeader
+                title={`Number of Votes : ${votedForChrissy.length}`}
+              />
+            <CardMedia
+                component="img"
+                height={500}
+                image={chrissyImage}
+                title="Chrissy"
+                style={{
+                 position: 'relative'
+
+                }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                color: 'black',
+                backgroundColor: 'white'
+              }}
+            >
+              50
+
+            </div>
           </Card>
         </Grid>
         <Grid item xs={6}>
           <Card>
-            <CardMedia component="img" height="500" image={deniseImage} title="Denise" />
+            <CardHeader
+                title={`Number of Votes : ${votedForDenise.length}`}
+              />
+            <CardMedia
+                component="img"
+                height="500"
+                image={deniseImage}
+                title="Denise"
+            />
           </Card>
         </Grid>
       </Grid>
