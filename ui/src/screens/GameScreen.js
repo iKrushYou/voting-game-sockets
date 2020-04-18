@@ -341,7 +341,7 @@ function QuestionComplete({ currentQuestion, getUser }) {
             }}
           >
             <CardHeader title={`Votes: ${votes["chrissy"].length}`} />
-            <CardMedia component="img" height="350" image={currentQuestion.chrissyImage} title="Chrissy" />
+            <CardMedia component="img" style={{ height: 350 }} image={currentQuestion.chrissyImage} title="Chrissy" />
 
             <div
               style={{
@@ -387,7 +387,7 @@ function QuestionComplete({ currentQuestion, getUser }) {
           >
             <CardHeader title={`Votes: ${votes["denise"].length}`} />
             <div style={{ positon: "relative" }}>
-              <CardMedia component="img" height="350" image={currentQuestion.deniseImage} title={"Denise"} />
+              <CardMedia component="img" style={{ height: 350 }} image={currentQuestion.deniseImage} title={"Denise"} />
               <div
                 style={{
                   position: "absolute",
