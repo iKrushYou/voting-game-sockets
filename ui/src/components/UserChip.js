@@ -2,10 +2,10 @@ import React from "react";
 import Typography from "@material-ui/core/Typography";
 
 export default function UserChip(props) {
-  const { user } = props;
+  const { user, disabled = false } = props;
   const { name } = user;
 
-  const backgroundColor = user.sockets.length ? "#3498db" : "#95a5a6";
+  const backgroundColor = user.sockets.length && !disabled ? "#3498db" : "#95a5a6";
   const borderColor = user.owner ? "#f1c40f" : backgroundColor;
 
   return (

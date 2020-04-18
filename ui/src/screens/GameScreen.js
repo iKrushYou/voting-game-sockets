@@ -79,30 +79,30 @@ export default function ({ history }) {
   const currentQuestion = game?.questions[game.currentQuestion];
 
   return (
-    <Container maxWidth={"md"} disableGutters>
+    <Container maxWidth={"md"} disableGutters style={{ marginBottom: 64 }}>
       <Card>
         <CardContent style={{ backgroundColor: "#ecf0f1" }}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <Typography variant={"h3"}>Game Screen Welcome {userName}</Typography>
+              <Typography variant={"h3"}>Welcome {userName}</Typography>
             </Grid>
             {game ? (
               <>
-                <Grid item xs={12}>
-                  <Grid container spacing={1} style={{ alignItems: "center" }}>
-                    <Grid item>
-                      <Typography>Users in game: </Typography>
-                    </Grid>
-                    {users.map((user) => (
-                      <Grid item key={user.id}>
-                        <UserChip
-                          user={user}
-                          color={user.sockets.length ? (user.owner ? "secondary" : "primary") : "default"}
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Grid>
+                {/*<Grid item xs={12}>*/}
+                {/*  <Grid container spacing={1} style={{ alignItems: "center" }}>*/}
+                {/*    <Grid item>*/}
+                {/*      <Typography>Users in game: </Typography>*/}
+                {/*    </Grid>*/}
+                {/*    {users.map((user) => (*/}
+                {/*      <Grid item key={user.id}>*/}
+                {/*        <UserChip*/}
+                {/*          user={user}*/}
+                {/*          color={user.sockets.length ? (user.owner ? "secondary" : "primary") : "default"}*/}
+                {/*        />*/}
+                {/*      </Grid>*/}
+                {/*    ))}*/}
+                {/*  </Grid>*/}
+                {/*</Grid>*/}
                 <Grid item xs={12}>
                   <Collapse in={currentQuestion.done}>
                     <QuestionComplete currentQuestion={currentQuestion} getUser={getUser} />
@@ -129,31 +129,45 @@ export default function ({ history }) {
                       </Typography>
                     </div>
                     <div style={{ display: "flex", margin: -4 }}>
-                      <Button
-                        variant={"outlined"}
-                        color={"primary"}
-                        onClick={() => handleChangeQuestion("PREV")}
-                        style={{ margin: 4 }}
-                      >
-                        Prev
-                      </Button>
+                      {currentQuestion.done ? (
+                        <Button
+                          variant={"outlined"}
+                          color={"primary"}
+                          onClick={() => handleFinishQuestion()}
+                          style={{ margin: 4 }}
+                        >
+                          {currentQuestion.done ? "Back" : "Done"}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant={"outlined"}
+                          color={"primary"}
+                          onClick={() => handleChangeQuestion("PREV")}
+                          style={{ margin: 4 }}
+                        >
+                          Prev
+                        </Button>
+                      )}
                       <div style={{ flex: 1 }} />
-                      <Button
-                        variant={"outlined"}
-                        color={"primary"}
-                        onClick={() => handleFinishQuestion()}
-                        style={{ margin: 4 }}
-                      >
-                        {currentQuestion.done ? "Back" : "Done"}
-                      </Button>
-                      <Button
-                        variant={"outlined"}
-                        color={"primary"}
-                        onClick={() => handleChangeQuestion("NEXT")}
-                        style={{ margin: 4 }}
-                      >
-                        Next
-                      </Button>
+                      {currentQuestion.done ? (
+                        <Button
+                          variant={"outlined"}
+                          color={"primary"}
+                          onClick={() => handleChangeQuestion("NEXT")}
+                          style={{ margin: 4 }}
+                        >
+                          Next
+                        </Button>
+                      ) : (
+                        <Button
+                          variant={"outlined"}
+                          color={"primary"}
+                          onClick={() => handleFinishQuestion()}
+                          style={{ margin: 4 }}
+                        >
+                          {currentQuestion.done ? "Back" : "Done"}
+                        </Button>
+                      )}
                     </div>
                   </Grid>
                 )}
@@ -168,15 +182,16 @@ export default function ({ history }) {
           </Grid>
         </CardContent>
       </Card>
-      <Card style={{ overflow: "scroll", marginTop: 64 }}>
-        <pre>{JSON.stringify(game, null, 2)}</pre>
-      </Card>
+      {/*<Card style={{ overflow: "scroll", marginTop: 64 }}>*/}
+      {/*  <pre>{JSON.stringify(game, null, 2)}</pre>*/}
+      {/*</Card>*/}
     </Container>
   );
 }
 
 function QuestionAnswer({ currentQuestion, handleCastVote, userId, game }) {
   const usersLeftToVote = game.users.filter((_user) => !currentQuestion.responses.hasOwnProperty(_user.id));
+  const usersWhoVoted = game.users.filter((_user) => currentQuestion.responses.hasOwnProperty(_user.id));
 
   return (
     <Grid container spacing={1}>
@@ -215,11 +230,11 @@ function QuestionAnswer({ currentQuestion, handleCastVote, userId, game }) {
         </Grid>
       ))}
       <Grid item xs={12}>
-        <Typography>{usersLeftToVote.length ? "Who hasn't voted:" : "Everyone has voted"}</Typography>
+        <Typography>{usersLeftToVote.length ? "Waiting on votes" : "Everyone has voted"}</Typography>
       </Grid>
-      {usersLeftToVote.map((_user) => (
+      {game.users.map((_user) => (
         <Grid item>
-          <UserChip key={_user.id} user={_user} />
+          <UserChip key={_user.id} user={_user} disabled={!currentQuestion.responses.hasOwnProperty(_user.id)} />
         </Grid>
       ))}
     </Grid>
@@ -269,8 +284,12 @@ function QuestionComplete({ currentQuestion, getUser }) {
     }
   }, [currentQuestion.done]);
 
-  const percentChrissy = !!votes["chrissy"].length ? ((votes["chrissy"].length / (votes["denise"].length + votes["chrissy"].length)) * 50).toFixed(2) : 0
-  const percentDenise = !!votes["denise"].length ? ((votes["denise"].length / (votes["denise"].length + votes["chrissy"].length)) * 50).toFixed(2) : 0
+  const percentChrissy = !!votes["chrissy"].length
+    ? ((votes["chrissy"].length / (votes["denise"].length + votes["chrissy"].length)) * 50).toFixed(2)
+    : 0;
+  const percentDenise = !!votes["denise"].length
+    ? ((votes["denise"].length / (votes["denise"].length + votes["chrissy"].length)) * 50).toFixed(2)
+    : 0;
   // const votePercent = 1 / responseCount;
   // const percentChrissy = votes["chrissy"].length * votePercent * 100;
   // const percentDenise = votes["denise"].length * votePercent * 100;
@@ -292,7 +311,7 @@ function QuestionComplete({ currentQuestion, getUser }) {
               {winner === "Tied" ? "Tied between Denise and Chrissy" : `Winner is ${winner}`}
             </Typography>
           )}
-          {doneVoting && (
+          <Collapse in={doneVoting}>
             <Typography variant={"h6"}>
               {winner === "Tied"
                 ? "Everyone Drink!!"
@@ -308,11 +327,20 @@ function QuestionComplete({ currentQuestion, getUser }) {
                       : "Just Dan I guess since everyone voted the same"
                   }`}
             </Typography>
-          )}
+          </Collapse>
         </Grid>
         <Grid item xs={6}>
-          <Card style={{ position: "relative", overflow: "hidden" }}>
-            <CardHeader title={`Number of Votes : ${votes["chrissy"].length}`} />
+          <Card
+            style={{
+              position: "relative",
+              overflow: "hidden",
+              borderWidth: 5,
+              borderStyle: "solid",
+              borderColor:
+                doneVoting && winner === "Chrissy" ? "green" : doneVoting && winner === "Tied" ? "blue" : "transparent",
+            }}
+          >
+            <CardHeader title={`Votes: ${votes["chrissy"].length}`} />
             <CardMedia component="img" height="350" image={currentQuestion.chrissyImage} title="Chrissy" />
 
             <div
@@ -322,7 +350,7 @@ function QuestionComplete({ currentQuestion, getUser }) {
                 left: "0",
                 color: "black",
                 backgroundColor:
-                  percentChrissy > (50 / 2) ? "#2ecc71" : parseInt(percentChrissy) === (50 / 2) ? "#2980b9" : "#e74c3c",
+                  percentChrissy > 50 / 2 ? "#2ecc71" : parseInt(percentChrissy) === 50 / 2 ? "#2980b9" : "#e74c3c",
                 width: "100%",
                 height: `${percentChrissy * 0.85}%`,
                 opacity: 0.5,
@@ -340,16 +368,25 @@ function QuestionComplete({ currentQuestion, getUser }) {
             >
               {votes["chrissy"].map((name, ind) => (
                 <Grid item key={ind}>
-                  <Chip color={percentChrissy > (50 / 2) ? "primary" : "secondary"} label={name} />
+                  <Chip color={percentChrissy > 50 / 2 ? "primary" : "secondary"} label={name} />
                 </Grid>
               ))}
             </Grid>
           </Card>
         </Grid>
         <Grid item xs={6}>
-          <Card style={{ position: "relative", overflow: "hidden" }}>
-            <CardHeader title={`Number of Votes : ${votes["denise"].length}`} />
-            <div style={{ positon: "relative", backgroundColor: "blue" }}>
+          <Card
+            style={{
+              position: "relative",
+              overflow: "hidden",
+              borderColor:
+                doneVoting && winner === "Denise" ? "green" : doneVoting && winner === "Tied" ? "blue" : "transparent",
+              borderWidth: 5,
+              borderStyle: "solid",
+            }}
+          >
+            <CardHeader title={`Votes: ${votes["denise"].length}`} />
+            <div style={{ positon: "relative" }}>
               <CardMedia component="img" height="350" image={currentQuestion.deniseImage} title={"Denise"} />
               <div
                 style={{
@@ -358,7 +395,7 @@ function QuestionComplete({ currentQuestion, getUser }) {
                   left: "0",
                   color: "black",
                   backgroundColor:
-                    percentDenise > (50 / 2) ? "#2ecc71" : parseInt(percentDenise) === (50 / 2) ? "#2980b9" : "#e74c3c",
+                    percentDenise > 50 / 2 ? "#2ecc71" : parseInt(percentDenise) === 50 / 2 ? "#2980b9" : "#e74c3c",
                   width: "100%",
                   height: `${0.85 * percentDenise}%`,
                   opacity: 0.5,
@@ -377,7 +414,7 @@ function QuestionComplete({ currentQuestion, getUser }) {
             >
               {votes["denise"].map((name, ind) => (
                 <Grid item key={ind}>
-                  <Chip color={percentDenise > (50 / 2) ? "primary" : "secondary"} label={name} />
+                  <Chip color={percentDenise > 50 / 2 ? "primary" : "secondary"} label={name} />
                 </Grid>
               ))}
             </Grid>
