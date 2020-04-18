@@ -19,19 +19,15 @@ export default function ({ history }) {
     const { userId, userName } = useGameContext();
 
     const [game, setGame] = useState();
+    const [chrissyImage] = useState(images.chrissy[Math.floor(Math.random() * images.chrissy.length)])
+    const [deniseImage] = useState(images.chrissy[Math.floor(Math.random() * images.chrissy.length)])
 
-    let chrissyImage = images.chrissy[Math.floor(Math.random() * images.chrissy.length)]
-    let deniseImage = images.denise[Math.floor(Math.random() * images.denise.length)]
     const users = game?.users.sort((a, b) => b.sockets.length - a.sockets.length) || [];
     const getUser = (userId) => users.find((_user) => _user.id === userId);
     const currentUser = getUser(userId);
     const currentQuestion = game?.questions[game.currentQuestion];
 
-    useEffect(() => {
-        chrissyImage = images.chrissy[Math.floor(Math.random() * images.chrissy.length)]
-        deniseImage  = images.denise[Math.floor(Math.random() * images.denise.length)]
-        console.log(chrissyImage)
-    },[currentQuestion])
+
 
     const handleLeaveGame = () => {
         history.push("/");

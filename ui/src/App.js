@@ -11,7 +11,6 @@ function App() {
         <Router>
           <Route path={"/"} exact component={HomeScreen} />
           <Route path={"/game"} exact component={GameScreen} />
-          <Route path={"/gameMenu"} exact component={GameMainMenu} />
 
         </Router>
       </GameProvider>

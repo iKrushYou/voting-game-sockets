@@ -11,6 +11,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Chip from "@material-ui/core/Chip";
 import ButtonBase from "@material-ui/core/ButtonBase";
 import Button from "@material-ui/core/Button";
+import * as images from '../Image/images'
 
 let socket;
 
@@ -128,17 +129,17 @@ export default function ({ history }) {
                     ))}
                   </Grid>
                 </Grid>
-                {/*{currentUser?.owner && (*/}
-                {/*  <Grid item xs={12} style={{ display: "flex" }}>*/}
-                {/*    <Button variant={"outlined"} color={"primary"} onClick={() => handleChangeQuestion("PREV")}>*/}
-                {/*      Prev*/}
-                {/*    </Button>*/}
-                {/*    <div style={{ flex: 1 }} />*/}
-                {/*    <Button variant={"outlined"} color={"primary"} onClick={() => handleChangeQuestion("NEXT")}>*/}
-                {/*      Next*/}
-                {/*    </Button>*/}
-                {/*  </Grid>*/}
-                {/*)}*/}
+                {currentUser?.owner && (
+                  <Grid item xs={12} style={{ display: "flex" }}>
+                    <Button variant={"outlined"} color={"primary"} onClick={() => handleChangeQuestion("PREV")}>
+                      Prev
+                    </Button>
+                    <div style={{ flex: 1 }} />
+                    <Button variant={"outlined"} color={"primary"} onClick={() => handleChangeQuestion("NEXT")}>
+                      Next
+                    </Button>
+                  </Grid>
+                )}
               </>
             ) : (
               <Grid item xs={12}>
@@ -150,7 +151,6 @@ export default function ({ history }) {
           </Grid>
         </CardContent>
       </Card>
-      {/*<pre>{JSON.stringify(game, null, 2)}</pre>*/}
     </Container>
   );
 }
