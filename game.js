@@ -2,11 +2,13 @@ const { uuid } = require("uuidv4");
 const data = require("./questions");
 const images = require("./images.json");
 
-const game = {
+const blankGame = {
   users: [],
   questions: data.questions,
   currentQuestion: 0,
 };
+
+const game = {...blankGame}
 
 const findUserBySocketId = (socketId) => {
   return game.users.find((xUser) => xUser.sockets.includes(socketId));
@@ -57,7 +59,7 @@ const castVote = ({ socketId, questionId, choice }) => {
 
 const changeQuestion = ({ socketId, direction }) => {
   const user = findUserBySocketId(socketId);
-  if (!user.owner) return { error: "Not owner" };
+  // if (!user.owner) return { error: "Not owner" };
   if (direction === "NEXT") {
     game.currentQuestion = Math.min(game.currentQuestion + 1, game.questions.length - 1);
   } else {
@@ -69,7 +71,7 @@ const changeQuestion = ({ socketId, direction }) => {
 
 const finishQuestion = ({ socketId }) => {
   const user = findUserBySocketId(socketId);
-  if (!user.owner) return { error: "Not owner" };
+  // if (!user.owner) return { error: "Not owner" };
   const question = game.questions[game.currentQuestion];
   question.done = !question.done;
 
@@ -82,4 +84,14 @@ const finishQuestion = ({ socketId }) => {
   return { game };
 };
 
-module.exports = { game, joinGame, leaveGame, castVote, changeQuestion, finishQuestion };
+const resetGame = ({socketId}) => {
+  const user = findUserBySocketId(socketId);
+  // if (!user.owner) return { error: "Not owner" };
+  game.users = []
+  game.questions = [...data.questions]
+  game.currentQuestion = 0
+
+  return {}
+}
+
+module.exports = { game, joinGame, leaveGame, castVote, changeQuestion, finishQuestion, resetGame };

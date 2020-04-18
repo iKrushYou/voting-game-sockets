@@ -3,7 +3,7 @@ const socketio = require("socket.io");
 const http = require("http");
 const moment = require("moment");
 
-const { game, joinGame, leaveGame, castVote, changeQuestion, finishQuestion } = require("./game");
+const { game, joinGame, leaveGame, castVote, changeQuestion, finishQuestion, resetGame } = require("./game");
 
 const PORT = process.env.PORT || 3001;
 
@@ -26,6 +26,8 @@ const SocketFunctions = {
   LEAVE_GAME: "LEAVE_GAME",
   GAME_UPDATE: "GAME_UPDATE",
   UPDATE_SCORE: "UPDATE_SCORE",
+  RESET_GAME: "RESET_GAME",
+  END_GAME: "END_GAME",
 };
 
 const gameKey = "GAME";
@@ -69,7 +71,7 @@ io.on(SocketFunctions.CONNECTION, (socket) => {
       return;
     }
 
-    const { error, game } = castVote({
+    const { error } = castVote({
       socketId: socket.id,
       questionId,
       choice,
@@ -81,14 +83,14 @@ io.on(SocketFunctions.CONNECTION, (socket) => {
   });
 
   socket.on(SocketFunctions.CHANGE_QUESTION, (props, callback) => {
-    console.log(`${moment().format()}: ${SocketFunctions.CAST_VOTE} ${JSON.stringify(props)}`);
+    console.log(`${moment().format()}: ${SocketFunctions.CHANGE_QUESTION} ${JSON.stringify(props)}`);
     const { direction } = props;
     if (!["NEXT", "PREV"].includes(direction)) {
       callback({ error: "invalid direction" });
       return;
     }
 
-    const { error, game } = changeQuestion({
+    const { error } = changeQuestion({
       socketId: socket.id,
       direction,
     });
@@ -99,13 +101,25 @@ io.on(SocketFunctions.CONNECTION, (socket) => {
   });
 
   socket.on(SocketFunctions.FINISH_QUESTION, (props, callback) => {
-    console.log(`${moment().format()}: ${SocketFunctions.CAST_VOTE} ${JSON.stringify(props)}`);
+    console.log(`${moment().format()}: ${SocketFunctions.FINISH_QUESTION} ${JSON.stringify(props)}`);
 
-    const { error, game } = finishQuestion({
+    const { error } = finishQuestion({
       socketId: socket.id,
     });
 
     updateGame(socket, game);
+
+    callback({});
+  });
+
+  socket.on(SocketFunctions.RESET_GAME, (props, callback) => {
+    console.log(`${moment().format()}: ${SocketFunctions.RESET_GAME} ${JSON.stringify(props)}`);
+
+    const { error } = resetGame({
+      socketId: socket.id,
+    });
+
+    socket.broadcast.to(gameKey).emit(SocketFunctions.END_GAME, game);
 
     callback({});
   });

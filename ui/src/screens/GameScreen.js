@@ -13,6 +13,7 @@ import Button from "@material-ui/core/Button";
 import UserChip from "../components/UserChip";
 import { CardMedia, CardHeader, Chip } from "@material-ui/core";
 import Collapse from "@material-ui/core/Collapse";
+import { handleCastVote, handleChangeQuestion, handleFinishQuestion } from "../functions/GameService";
 let socket;
 
 export default function ({ history }) {
@@ -36,11 +37,14 @@ export default function ({ history }) {
           handleLeaveGame();
         }
       });
-      // fetchGame().then(setGame);
     });
 
     socket.on(SOCKET_FUNCTIONS.GAME_UPDATE, (gameUpdate) => {
       setGame(gameUpdate);
+    });
+
+    socket.on(SOCKET_FUNCTIONS.END_GAME, () => {
+      handleLeaveGame();
     });
 
     return () => {
@@ -49,31 +53,9 @@ export default function ({ history }) {
     };
   }, []);
 
-  const handleCastVote = (questionId, choice) => {
-    socket.emit(SOCKET_FUNCTIONS.CAST_VOTE, { questionId, choice }, ({ error }) => {
-      if (error) {
-        alert(error);
-      }
-    });
-  };
+  const isOnline = (user) => !!user.sockets.length;
 
-  const handleChangeQuestion = (direction) => {
-    socket.emit(SOCKET_FUNCTIONS.CHANGE_QUESTION, { direction }, ({ error }) => {
-      if (error) {
-        alert(error);
-      }
-    });
-  };
-
-  const handleFinishQuestion = () => {
-    socket.emit(SOCKET_FUNCTIONS.FINISH_QUESTION, {}, ({ error }) => {
-      if (error) {
-        alert(error);
-      }
-    });
-  };
-
-  const users = game?.users.sort((a, b) => b.sockets.length - a.sockets.length) || [];
+  const users = game?.users.sort((a, b) => b.id.localeCompare(a.id)).sort((a, b) => isOnline(b) - isOnline(a)) || [];
   const getUser = (userId) => users.find((_user) => _user.id === userId);
   const currentUser = getUser(userId);
   const currentQuestion = game?.questions[game.currentQuestion];
@@ -133,7 +115,7 @@ export default function ({ history }) {
                         <Button
                           variant={"outlined"}
                           color={"primary"}
-                          onClick={() => handleFinishQuestion()}
+                          onClick={() => handleFinishQuestion(socket)}
                           style={{ margin: 4 }}
                         >
                           {currentQuestion.done ? "Back" : "Done"}
@@ -142,7 +124,7 @@ export default function ({ history }) {
                         <Button
                           variant={"outlined"}
                           color={"primary"}
-                          onClick={() => handleChangeQuestion("PREV")}
+                          onClick={() => handleChangeQuestion(socket, "PREV")}
                           style={{ margin: 4 }}
                         >
                           Prev
@@ -153,7 +135,7 @@ export default function ({ history }) {
                         <Button
                           variant={"outlined"}
                           color={"primary"}
-                          onClick={() => handleChangeQuestion("NEXT")}
+                          onClick={() => handleChangeQuestion(socket, "NEXT")}
                           style={{ margin: 4 }}
                         >
                           Next
@@ -162,7 +144,7 @@ export default function ({ history }) {
                         <Button
                           variant={"outlined"}
                           color={"primary"}
-                          onClick={() => handleFinishQuestion()}
+                          onClick={() => handleFinishQuestion(socket)}
                           style={{ margin: 4 }}
                         >
                           {currentQuestion.done ? "Back" : "Done"}
@@ -208,22 +190,10 @@ function QuestionAnswer({ currentQuestion, handleCastVote, userId, game }) {
           >
             <ButtonBase
               style={{ width: "100%", height: "100%" }}
-              onClick={() => handleCastVote(game.currentQuestion, choice)}
+              onClick={() => handleCastVote(socket, game.currentQuestion, choice)}
             >
               <CardContent style={{ width: "100%" }}>
                 <Typography>{choice}</Typography>
-                {/*<Grid container spacing={1}>*/}
-                {/*  {Object.entries(currentQuestion.responses)*/}
-                {/*    .filter(([_, responseChoice]) => responseChoice === choice)*/}
-                {/*    .map(([responseUserId, responseChoice]) => {*/}
-                {/*      const responseUser = getUser(responseUserId);*/}
-                {/*      return (*/}
-                {/*        <Grid item>*/}
-                {/*          <Chip label={responseUser.name} />*/}
-                {/*        </Grid>*/}
-                {/*      );*/}
-                {/*    })}*/}
-                {/*</Grid>*/}
               </CardContent>
             </ButtonBase>
           </Card>
@@ -246,8 +216,8 @@ const TIMEOUT = 1000;
 function QuestionComplete({ currentQuestion, getUser }) {
   const [votes, setVotes] = useState({ chrissy: [], denise: [] });
   const responseCount = Object.keys(currentQuestion.responses).length;
-  const doneVoting = useMemo(() => votes.chrissy.length + votes.denise.length === responseCount, [votes]);
   const [step, setStep] = useState(-1);
+  const doneVoting = useMemo(() => step === responseCount, [step]);
 
   const counterRef = useRef();
 
@@ -256,11 +226,12 @@ function QuestionComplete({ currentQuestion, getUser }) {
   };
 
   useEffect(() => {
-    if (step === Object.keys(currentQuestion.responses).length) {
+    console.log({ step, votes, doneVoting });
+    if (step === responseCount) {
       clearInterval(counterRef.current);
       return;
     }
-    if (step >= 0) {
+    if (step >= 0 && step < responseCount) {
       const entries = Object.entries(currentQuestion.responses);
       const [userId, answer] = entries[step];
       const user = getUser(userId);
