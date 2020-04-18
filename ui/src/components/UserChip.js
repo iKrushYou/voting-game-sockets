@@ -5,8 +5,8 @@ export default function UserChip(props) {
   const { user } = props;
   const { name } = user;
 
-  const backgroundColor = user.sockets.length ? '#3498db' : '#95a5a6';
-  const borderColor = user.owner ? '#f1c40f' : backgroundColor;
+  const backgroundColor = user.sockets.length ? "#3498db" : "#95a5a6";
+  const borderColor = user.owner ? "#f1c40f" : backgroundColor;
 
   return (
     <div
@@ -19,8 +19,8 @@ export default function UserChip(props) {
         borderRadius: 100,
         borderColor,
         borderSize: 1,
-        borderStyle: 'solid',
-        color: 'white'
+        borderStyle: "solid",
+        color: "white",
       }}
     >
       <Typography>{name}</Typography>

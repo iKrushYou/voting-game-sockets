@@ -92,7 +92,9 @@ export default function ({ history }) {
               <>
                 <Grid item xs={12}>
                   <Grid container spacing={1} style={{ alignItems: "center" }}>
-                    <Grid item><Typography>Users in game: </Typography></Grid>
+                    <Grid item>
+                      <Typography>Users in game: </Typography>
+                    </Grid>
                     {users.map((user) => (
                       <Grid item key={user.id}>
                         <UserChip
@@ -114,15 +116,30 @@ export default function ({ history }) {
                   />
                 )}
                 {currentUser?.owner && (
-                  <Grid item xs={12} style={{ display: "flex" }}>
-                    <Button variant={"outlined"} color={"primary"} onClick={() => handleChangeQuestion("PREV")}>
+                  <Grid item xs={12} style={{ display: "flex", margin: -4 }}>
+                    <Button
+                      variant={"outlined"}
+                      color={"primary"}
+                      onClick={() => handleChangeQuestion("PREV")}
+                      style={{ margin: 4 }}
+                    >
                       Prev
                     </Button>
                     <div style={{ flex: 1 }} />
-                    <Button variant={"outlined"} color={"primary"} onClick={() => handleFinishQuestion()}>
+                    <Button
+                      variant={"outlined"}
+                      color={"primary"}
+                      onClick={() => handleFinishQuestion()}
+                      style={{ margin: 4 }}
+                    >
                       {currentQuestion.done ? "Back" : "Done"}
                     </Button>
-                    <Button variant={"outlined"} color={"primary"} onClick={() => handleChangeQuestion("NEXT")}>
+                    <Button
+                      variant={"outlined"}
+                      color={"primary"}
+                      onClick={() => handleChangeQuestion("NEXT")}
+                      style={{ margin: 4 }}
+                    >
                       Next
                     </Button>
                   </Grid>
@@ -148,8 +165,10 @@ export default function ({ history }) {
 function QuestionAnswer({ currentQuestion, handleCastVote, userId, game }) {
   return (
     <Grid item xs={12}>
-      <Typography variant={"h5"}>{currentQuestion.question}</Typography>
       <Grid container spacing={1}>
+        <Grid item xs={12}>
+          <Typography variant={"h5"}>{currentQuestion.question}</Typography>
+        </Grid>
         {currentQuestion.choices.map((choice) => (
           <Grid item xs={12} md={6}>
             <Card
@@ -181,6 +200,16 @@ function QuestionAnswer({ currentQuestion, handleCastVote, userId, game }) {
             </Card>
           </Grid>
         ))}
+        <Grid item xs={12}>
+          <Typography>Who hasn't voted: </Typography>
+        </Grid>
+        {game.users
+          .filter((_user) => !currentQuestion.responses.hasOwnProperty(_user.id))
+          .map((_user) => (
+            <Grid item>
+              <UserChip key={_user.id} user={_user} />
+            </Grid>
+          ))}
       </Grid>
     </Grid>
   );
