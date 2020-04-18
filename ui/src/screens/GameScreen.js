@@ -13,6 +13,7 @@ import ButtonBase from "@material-ui/core/ButtonBase";
 import Button from "@material-ui/core/Button";
 import * as images from "../Image/images";
 import { CardMedia } from "@material-ui/core";
+import UserChip from "../components/UserChip";
 
 let socket;
 
@@ -67,7 +68,7 @@ export default function ({ history }) {
   };
 
   const handleFinishQuestion = () => {
-    socket.emit(SOCKET_FUNCTIONS.FINISH_QUESTION, { }, ({ error }) => {
+    socket.emit(SOCKET_FUNCTIONS.FINISH_QUESTION, {}, ({ error }) => {
       if (error) {
         alert(error);
       }
@@ -82,7 +83,7 @@ export default function ({ history }) {
   return (
     <Container maxWidth={"md"}>
       <Card>
-        <CardContent style={{ backgroundColor: "#ececec" }}>
+        <CardContent style={{ backgroundColor: "#ecf0f1" }}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Typography variant={"h3"}>Game Screen Welcome {userName}</Typography>
@@ -91,11 +92,11 @@ export default function ({ history }) {
               <>
                 <Grid item xs={12}>
                   <Grid container spacing={1} style={{ alignItems: "center" }}>
-                    <Grid item>Users in game: </Grid>
+                    <Grid item><Typography>Users in game: </Typography></Grid>
                     {users.map((user) => (
                       <Grid item key={user.id}>
-                        <Chip
-                          label={user.name}
+                        <UserChip
+                          user={user}
                           color={user.sockets.length ? (user.owner ? "secondary" : "primary") : "default"}
                         />
                       </Grid>
@@ -119,7 +120,7 @@ export default function ({ history }) {
                     </Button>
                     <div style={{ flex: 1 }} />
                     <Button variant={"outlined"} color={"primary"} onClick={() => handleFinishQuestion()}>
-                      Done
+                      {currentQuestion.done ? "Back" : "Done"}
                     </Button>
                     <Button variant={"outlined"} color={"primary"} onClick={() => handleChangeQuestion("NEXT")}>
                       Next
@@ -137,7 +138,9 @@ export default function ({ history }) {
           </Grid>
         </CardContent>
       </Card>
-      <pre>{JSON.stringify(game, null, 2)}</pre>
+      <Card style={{ overflow: "scroll", marginTop: 64 }}>
+        <pre>{JSON.stringify(game, null, 2)}</pre>
+      </Card>
     </Container>
   );
 }
@@ -152,7 +155,7 @@ function QuestionAnswer({ currentQuestion, handleCastVote, userId, game }) {
             <Card
               style={{
                 height: "100%",
-                backgroundColor: currentQuestion.responses[userId] === choice ? "#a6cff1" : null,
+                backgroundColor: currentQuestion.responses[userId] === choice ? "rgba(52,152,219,0.5)" : null,
               }}
             >
               <ButtonBase
