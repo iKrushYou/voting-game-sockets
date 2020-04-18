@@ -269,11 +269,11 @@ function QuestionComplete({ currentQuestion, getUser }) {
     }
   }, [currentQuestion.done]);
 
-  // const percentChrissy = !!votes["chrissy"].length ? ((votes["chrissy"].length / (votes["denise"].length + votes["chrissy"].length)) * 100).toFixed(2) : 0
-  // const percentDenise = !!votes["denise"].length ? ((votes["denise"].length / (votes["denise"].length + votes["chrissy"].length)) * 100).toFixed(2) : 0
-  const votePercent = 1 / responseCount;
-  const percentChrissy = votes["chrissy"].length * votePercent * 100;
-  const percentDenise = votes["denise"].length * votePercent * 100;
+  const percentChrissy = !!votes["chrissy"].length ? ((votes["chrissy"].length / (votes["denise"].length + votes["chrissy"].length)) * 50).toFixed(2) : 0
+  const percentDenise = !!votes["denise"].length ? ((votes["denise"].length / (votes["denise"].length + votes["chrissy"].length)) * 50).toFixed(2) : 0
+  // const votePercent = 1 / responseCount;
+  // const percentChrissy = votes["chrissy"].length * votePercent * 100;
+  // const percentDenise = votes["denise"].length * votePercent * 100;
 
   const winner =
     votes["chrissy"].length === votes["denise"].length
@@ -315,21 +315,20 @@ function QuestionComplete({ currentQuestion, getUser }) {
             <CardHeader title={`Number of Votes : ${votes["chrissy"].length}`} />
             <CardMedia component="img" height="350" image={currentQuestion.chrissyImage} title="Chrissy" />
 
-            {!!votes["chrissy"].length && (
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: "0",
-                  left: "0",
-                  color: "black",
-                  backgroundColor:
-                    percentChrissy > 50 ? "#2ecc71" : parseInt(percentChrissy) === 50 ? "#2980b9" : "#e74c3c",
-                  width: "100%",
-                  height: `${(percentChrissy * 0.85).toFixed(2)}%`,
-                  opacity: 0.5,
-                }}
-              ></div>
-            )}
+            <div
+              style={{
+                position: "absolute",
+                bottom: "0",
+                left: "0",
+                color: "black",
+                backgroundColor:
+                  percentChrissy > (50 / 2) ? "#2ecc71" : parseInt(percentChrissy) === (50 / 2) ? "#2980b9" : "#e74c3c",
+                width: "100%",
+                height: `${percentChrissy * 0.85}%`,
+                opacity: 0.5,
+                transition: "all .3s ease-in",
+              }}
+            />
             <Grid
               container
               spacing={1}
@@ -341,7 +340,7 @@ function QuestionComplete({ currentQuestion, getUser }) {
             >
               {votes["chrissy"].map((name, ind) => (
                 <Grid item key={ind}>
-                  <Chip color={percentChrissy > 50 ? "primary" : "secondary"} label={name} />
+                  <Chip color={percentChrissy > (50 / 2) ? "primary" : "secondary"} label={name} />
                 </Grid>
               ))}
             </Grid>
@@ -350,8 +349,8 @@ function QuestionComplete({ currentQuestion, getUser }) {
         <Grid item xs={6}>
           <Card style={{ position: "relative", overflow: "hidden" }}>
             <CardHeader title={`Number of Votes : ${votes["denise"].length}`} />
-            <CardMedia component="img" height="350" image={currentQuestion.deniseImage} title="Denise" />
-            {!!votes["denise"].length && (
+            <div style={{ positon: "relative", backgroundColor: "blue" }}>
+              <CardMedia component="img" height="350" image={currentQuestion.deniseImage} title={"Denise"} />
               <div
                 style={{
                   position: "absolute",
@@ -359,13 +358,14 @@ function QuestionComplete({ currentQuestion, getUser }) {
                   left: "0",
                   color: "black",
                   backgroundColor:
-                    percentDenise > 50 ? "#2ecc71" : parseInt(percentDenise) === 50 ? "#2980b9" : "#e74c3c",
+                    percentDenise > (50 / 2) ? "#2ecc71" : parseInt(percentDenise) === (50 / 2) ? "#2980b9" : "#e74c3c",
                   width: "100%",
-                  height: `${(percentDenise * 0.85).toFixed(2)}%`,
+                  height: `${0.85 * percentDenise}%`,
                   opacity: 0.5,
+                  transition: "height .3s ease-in",
                 }}
-              ></div>
-            )}
+              />
+            </div>
             <Grid
               container
               spacing={1}
@@ -377,7 +377,7 @@ function QuestionComplete({ currentQuestion, getUser }) {
             >
               {votes["denise"].map((name, ind) => (
                 <Grid item key={ind}>
-                  <Chip color={percentDenise > 50 ? "primary" : "secondary"} label={name} />
+                  <Chip color={percentDenise > (50 / 2) ? "primary" : "secondary"} label={name} />
                 </Grid>
               ))}
             </Grid>
