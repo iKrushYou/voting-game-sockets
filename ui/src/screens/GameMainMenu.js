@@ -12,15 +12,14 @@ import Chip from "@material-ui/core/Chip";
 import ButtonBase from "@material-ui/core/ButtonBase";
 import Button from "@material-ui/core/Button";
 import { CardMedia } from "@material-ui/core";
-import * as images from "../Image/images";
 let socket;
 
 export default function ({ history }) {
   const { userId, userName } = useGameContext();
 
   const [game, setGame] = useState();
-  const [chrissyImage] = useState(images.chrissy[Math.floor(Math.random() * images.chrissy.length)]);
-  const [deniseImage] = useState(images.chrissy[Math.floor(Math.random() * images.chrissy.length)]);
+  const [chrissyImage] = []; //useState(images.chrissy[Math.floor(Math.random() * images.chrissy.length)]);
+  const [deniseImage] = []; //useState(images.chrissy[Math.floor(Math.random() * images.chrissy.length)]);
 
   const users = game?.users.sort((a, b) => b.sockets.length - a.sockets.length) || [];
   const getUser = (userId) => users.find((_user) => _user.id === userId);
