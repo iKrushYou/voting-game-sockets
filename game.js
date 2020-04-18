@@ -1,5 +1,6 @@
 const { uuid } = require("uuidv4");
 const data = require("./questions");
+const images = require("./images.json");
 
 const game = {
   users: [],
@@ -43,7 +44,7 @@ const leaveGame = ({ socketId }) => {
 const castVote = ({ socketId, questionId, choice }) => {
   const user = findUserBySocketId(socketId);
   const question = game.questions[questionId];
-  if (question.responses.hasOwnProperty(user.id)) {
+  if (question.responses[user.id] === choice) {
     // remove vote
     delete question.responses[user.id];
   } else {
@@ -71,6 +72,13 @@ const finishQuestion = ({ socketId }) => {
   if (!user.owner) return { error: "Not owner" };
   const question = game.questions[game.currentQuestion];
   question.done = !question.done;
+
+  ["chrissy", "denise"].forEach((personImage) => {
+    if (!question[`${personImage}Image`]) {
+      question[`${personImage}Image`] = images[personImage][Math.floor(Math.random() * images[personImage].length)];
+    }
+  });
+
   return { game };
 };
 

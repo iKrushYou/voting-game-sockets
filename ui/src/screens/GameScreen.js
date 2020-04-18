@@ -8,12 +8,11 @@ import Typography from "@material-ui/core/Typography";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-import Chip from "@material-ui/core/Chip";
 import ButtonBase from "@material-ui/core/ButtonBase";
 import Button from "@material-ui/core/Button";
-import * as images from "../Image/images";
 import UserChip from "../components/UserChip";
 import { CardMedia, CardHeader } from "@material-ui/core";
+import Collapse from "@material-ui/core/Collapse";
 
 let socket;
 
@@ -105,46 +104,58 @@ export default function ({ history }) {
                     ))}
                   </Grid>
                 </Grid>
-                {currentQuestion.done ? (
-                  <QuestionComplete
+                <Grid item xs={12}>
+                  <Collapse in={currentQuestion.done}>
+                    <QuestionComplete currentQuestion={currentQuestion} getUser={getUser} />
+                  </Collapse>
+                </Grid>
+                <Grid item xs={12}>
+                  <Collapse in={!currentQuestion.done}>
+                    <QuestionAnswer
                       currentQuestion={currentQuestion}
-                      getUser={getUser}
-                  />
-                ) : (
-                  <QuestionAnswer
-                    currentQuestion={currentQuestion}
-                    handleCastVote={handleCastVote}
-                    userId={userId}
-                    game={game}
-                  />
-                )}
+                      handleCastVote={handleCastVote}
+                      userId={userId}
+                      game={game}
+                    />
+                  </Collapse>
+                </Grid>
                 {currentUser?.owner && (
-                  <Grid item xs={12} style={{ display: "flex", margin: -4 }}>
-                    <Button
-                      variant={"outlined"}
-                      color={"primary"}
-                      onClick={() => handleChangeQuestion("PREV")}
-                      style={{ margin: 4 }}
-                    >
-                      Prev
-                    </Button>
-                    <div style={{ flex: 1 }} />
-                    <Button
-                      variant={"outlined"}
-                      color={"primary"}
-                      onClick={() => handleFinishQuestion()}
-                      style={{ margin: 4 }}
-                    >
-                      {currentQuestion.done ? "Back" : "Done"}
-                    </Button>
-                    <Button
-                      variant={"outlined"}
-                      color={"primary"}
-                      onClick={() => handleChangeQuestion("NEXT")}
-                      style={{ margin: 4 }}
-                    >
-                      Next
-                    </Button>
+                  <Grid item xs={12}>
+                    <div>
+                      <Typography
+                        variant={"body2"}
+                        style={{ display: "flex", flexDirection: "row-reverse", marginBottom: 8 }}
+                      >
+                        Question {game.currentQuestion + 1} / {game.questions.length}
+                      </Typography>
+                    </div>
+                    <div style={{ display: "flex", margin: -4 }}>
+                      <Button
+                        variant={"outlined"}
+                        color={"primary"}
+                        onClick={() => handleChangeQuestion("PREV")}
+                        style={{ margin: 4 }}
+                      >
+                        Prev
+                      </Button>
+                      <div style={{ flex: 1 }} />
+                      <Button
+                        variant={"outlined"}
+                        color={"primary"}
+                        onClick={() => handleFinishQuestion()}
+                        style={{ margin: 4 }}
+                      >
+                        {currentQuestion.done ? "Back" : "Done"}
+                      </Button>
+                      <Button
+                        variant={"outlined"}
+                        color={"primary"}
+                        onClick={() => handleChangeQuestion("NEXT")}
+                        style={{ margin: 4 }}
+                      >
+                        Next
+                      </Button>
+                    </div>
                   </Grid>
                 )}
               </>
@@ -169,133 +180,111 @@ function QuestionAnswer({ currentQuestion, handleCastVote, userId, game }) {
   const usersLeftToVote = game.users.filter((_user) => !currentQuestion.responses.hasOwnProperty(_user.id));
 
   return (
-    <Grid item xs={12}>
-      <Grid container spacing={1}>
-        <Grid item xs={12}>
-          <Typography variant={"h5"}>{currentQuestion.question}</Typography>
-        </Grid>
-        {currentQuestion.choices.map((choice) => (
-          <Grid item xs={12} md={6}>
-            <Card
-              style={{
-                height: "100%",
-                backgroundColor: currentQuestion.responses[userId] === choice ? "rgba(52,152,219,0.5)" : null,
-              }}
-            >
-              <ButtonBase
-                style={{ width: "100%", height: "100%" }}
-                onClick={() => handleCastVote(game.currentQuestion, choice)}
-              >
-                <CardContent style={{ width: "100%" }}>
-                  <Typography>{choice}</Typography>
-                  {/*<Grid container spacing={1}>*/}
-                  {/*  {Object.entries(currentQuestion.responses)*/}
-                  {/*    .filter(([_, responseChoice]) => responseChoice === choice)*/}
-                  {/*    .map(([responseUserId, responseChoice]) => {*/}
-                  {/*      const responseUser = getUser(responseUserId);*/}
-                  {/*      return (*/}
-                  {/*        <Grid item>*/}
-                  {/*          <Chip label={responseUser.name} />*/}
-                  {/*        </Grid>*/}
-                  {/*      );*/}
-                  {/*    })}*/}
-                  {/*</Grid>*/}
-                </CardContent>
-              </ButtonBase>
-            </Card>
-          </Grid>
-        ))}
-        <Grid item xs={12}>
-          <Typography>{usersLeftToVote.length ? "Who hasn't voted:" : "Everyone has voted"}</Typography>
-        </Grid>
-        {usersLeftToVote.map((_user) => (
-          <Grid item>
-            <UserChip key={_user.id} user={_user} />
-          </Grid>
-        ))}
+    <Grid container spacing={1}>
+      <Grid item xs={12}>
+        <Typography variant={"h5"}>{currentQuestion.question}</Typography>
       </Grid>
+      {currentQuestion.choices.map((choice) => (
+        <Grid item xs={12} md={6}>
+          <Card
+            style={{
+              height: "100%",
+              backgroundColor: currentQuestion.responses[userId] === choice ? "rgba(52,152,219,0.5)" : null,
+            }}
+          >
+            <ButtonBase
+              style={{ width: "100%", height: "100%" }}
+              onClick={() => handleCastVote(game.currentQuestion, choice)}
+            >
+              <CardContent style={{ width: "100%" }}>
+                <Typography>{choice}</Typography>
+                {/*<Grid container spacing={1}>*/}
+                {/*  {Object.entries(currentQuestion.responses)*/}
+                {/*    .filter(([_, responseChoice]) => responseChoice === choice)*/}
+                {/*    .map(([responseUserId, responseChoice]) => {*/}
+                {/*      const responseUser = getUser(responseUserId);*/}
+                {/*      return (*/}
+                {/*        <Grid item>*/}
+                {/*          <Chip label={responseUser.name} />*/}
+                {/*        </Grid>*/}
+                {/*      );*/}
+                {/*    })}*/}
+                {/*</Grid>*/}
+              </CardContent>
+            </ButtonBase>
+          </Card>
+        </Grid>
+      ))}
+      <Grid item xs={12}>
+        <Typography>{usersLeftToVote.length ? "Who hasn't voted:" : "Everyone has voted"}</Typography>
+      </Grid>
+      {usersLeftToVote.map((_user) => (
+        <Grid item>
+          <UserChip key={_user.id} user={_user} />
+        </Grid>
+      ))}
     </Grid>
   );
 }
 
 function QuestionComplete({ currentQuestion, getUser }) {
-  const [chrissyImage] = useState(images.chrissy[Math.floor(Math.random() * images.chrissy.length)]);
-  const [deniseImage] = useState(images.denise[Math.floor(Math.random() * images.denise.length)]);
+  const [votedForChrissy, setVotedChrissy] = useState([]);
+  const [votedForDenise, setVotedDenise] = useState([]);
+  const [doneVoting, setDoneVoting] = useState(false);
 
-  const [votedForChrissy, setVotedChrissy] = useState([])
-  const [votedForDenise, setVotedDenise] = useState([])
-  const [doneVoting, setDoneVoting] =useState(false)
   useEffect(() => {
-    setDoneVoting(false)
-    console.log(currentQuestion)
+    setDoneVoting(false);
+    console.log(currentQuestion);
     Object.entries(currentQuestion.responses).map(([userId, answer]) => {
-      const user = getUser(userId)
+      const user = getUser(userId);
 
-      console.log(user)
-      if (answer === 'Chrissy') {
-
+      console.log(user);
+      if (answer === "Chrissy") {
         setTimeout(() => {
-          setVotedChrissy(chrissy => [...chrissy, user.name])
+          setVotedChrissy((chrissy) => [...chrissy, user.name]);
         }, 2000);
       } else {
         setTimeout(() => {
-          setVotedDenise(denise => [...denise, user.name])
+          setVotedDenise((denise) => [...denise, user.name]);
         }, 2000);
       }
-    })
-    setDoneVoting(true)
-
-
-
-  }, [currentQuestion])
-
+    });
+    setDoneVoting(true);
+  }, [currentQuestion]);
 
   return (
-    <Grid item xs={12}>
-      <Grid container spacing={1} direction="row" justify="center" alignItems="center">
-        <Grid item xs={12}>
-          <Typography variant={"h5"}>{currentQuestion.question}</Typography>
-        </Grid>
-        <Grid item xs={6}>
-          <Card>
-            <CardHeader
-                title={`Number of Votes : ${votedForChrissy.length}`}
-              />
-            <CardMedia
-                component="img"
-                height={500}
-                image={chrissyImage}
-                title="Chrissy"
-                style={{
-                 position: 'relative'
-
-                }}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                color: 'black',
-                backgroundColor: 'white'
-              }}
-            >
-              50
-
-            </div>
-          </Card>
-        </Grid>
-        <Grid item xs={6}>
-          <Card>
-            <CardHeader
-                title={`Number of Votes : ${votedForDenise.length}`}
-              />
-            <CardMedia
-                component="img"
-                height="500"
-                image={deniseImage}
-                title="Denise"
-            />
-          </Card>
-        </Grid>
+    <Grid container spacing={1} direction="row" justify="center" alignItems="center">
+      <Grid item xs={12}>
+        <Typography variant={"h5"}>{currentQuestion.question}</Typography>
+      </Grid>
+      <Grid item xs={6}>
+        <Card>
+          <CardHeader title={`Number of Votes : ${votedForChrissy.length}`} />
+          <CardMedia
+            component="img"
+            height={500}
+            image={currentQuestion.chrissyImage}
+            title="Chrissy"
+            style={{
+              position: "relative",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              color: "black",
+              backgroundColor: "white",
+            }}
+          >
+            50
+          </div>
+        </Card>
+      </Grid>
+      <Grid item xs={6}>
+        <Card>
+          <CardHeader title={`Number of Votes : ${votedForDenise.length}`} />
+          <CardMedia component="img" height="500" image={currentQuestion.deniseImage} title="Denise" />
+        </Card>
       </Grid>
     </Grid>
   );
