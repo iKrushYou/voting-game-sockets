@@ -2,6 +2,7 @@ const express = require("express");
 const socketio = require("socket.io");
 const http = require("http");
 const moment = require("moment");
+const path = require('path');
 
 const { game, joinGame, leaveGame, castVote, changeQuestion, finishQuestion, resetGame } = require("./game");
 
@@ -15,6 +16,12 @@ app.use((request, result, next) => {
   result.setHeader("Access-Control-Allow-Origin", "*");
   next();
 });
+
+// serve UI
+app.use(express.static(path.join(__dirname, 'ui/build')));
+app.get('*', (req, res, next) => {
+  res.sendFile(path.join(__dirname+'/ui/build/index.html'));
+})
 
 const SocketFunctions = {
   CONNECTION: "connection",
